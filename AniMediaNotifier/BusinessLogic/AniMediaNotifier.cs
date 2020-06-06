@@ -24,13 +24,15 @@ namespace AniMediaNotifier
 			_logger = logger;
 			_observer = observer;
 			_context = context;
+			
+			_observer.TitleChanged += OnTitleChanged;
 		}
 
 		private async void OnTitleChanged(Object sender, TitleChangedEventArgs e)
 		{
 			List<User> users = _context.UserTitles.Where(ut => ut.TitleId == e.TitleId).Select(ut => ut.User).ToList();
 
-			IEnumerable<Task> tasks = users.Select(u => SendMessageSafe(u, e));
+			List<Task> tasks = users.Select(u => SendMessageSafe(u, e)).ToList();
 
 			await Task.WhenAll(tasks);
 		}
